@@ -1,9 +1,8 @@
 package routes
 
 import (
+	"golang-example/utils"
 	"net/http"
-
-	"golang-example/middleware"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -17,5 +16,5 @@ func Status() http.Handler {
 }
 
 func statusGet(w http.ResponseWriter, r *http.Request) {
-	middleware.Ok(w, "Hello, the API is working")
+	utils.Ok(w, "Hello, the API is working")
 }

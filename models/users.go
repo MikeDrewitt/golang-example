@@ -18,9 +18,7 @@ type User struct {
 }
 
 func UserGet(id int) (user *User, _ error) {
-	db := database.Connect()
-
-	result := db.Where("deleted_at is null").First(&user, id)
+	result := database.Db.Where("deleted_at is null").First(&user, id)
 
 	if result.RowsAffected == 0 {
 		return nil, result.Error
@@ -30,8 +28,7 @@ func UserGet(id int) (user *User, _ error) {
 }
 
 func UserList() (users []User, _ error) {
-	db := database.Connect()
-	results := db.Where("deleted_at is null").Find(&users)
+	results := database.Db.Where("deleted_at is null").Find(&users)
 
 	if results.Error != nil {
 		return users, results.Error
@@ -40,8 +37,7 @@ func UserList() (users []User, _ error) {
 	return users, nil
 }
 func UserCreate(newUser User) (User, error) {
-	db := database.Connect()
-	results := db.Create(&newUser)
+	results := database.Db.Create(&newUser)
 
 	if results.Error != nil {
 		return newUser, results.Error
@@ -51,8 +47,7 @@ func UserCreate(newUser User) (User, error) {
 }
 
 func UserUpdate(updatedUser User) (User, error) {
-	db := database.Connect()
-	result := db.Model(&updatedUser).
+	result := database.Db.Model(&updatedUser).
 		Updates(User{Name: updatedUser.Name, Username: updatedUser.Username, Email: updatedUser.Email})
 
 	if result.Error != nil {
@@ -69,9 +64,7 @@ func UserDelete(id int) error {
 		return err
 	}
 
-	db := database.Connect()
-
-	db.Model(&user).Update("deleted_at", time.Now().UTC())
+	database.Db.Model(&user).Update("deleted_at", time.Now().UTC())
 
 	return nil
 }

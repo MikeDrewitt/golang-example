@@ -13,6 +13,8 @@ import (
 var logQuery = os.Getenv("LOG_QUERY") != ""
 var connectionString = os.Getenv("CONNECTION_STRING")
 
+var Db = Connect()
+
 func Connect() (db *gorm.DB) {
 	logLevel := logger.Default.LogMode(logger.Error)
 
