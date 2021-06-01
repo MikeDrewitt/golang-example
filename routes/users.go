@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"golang-example/middleware"
 	"golang-example/models"
+	"golang-example/utils"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -27,31 +27,28 @@ func User() http.Handler {
 func userGet(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	intId, err := strconv.Atoi(id)
-
 	if err != nil {
-		middleware.BadRequest(w, "Bad Id")
+		utils.BadRequest(w, "Bad Id")
 		return
 	}
 
-	user, dbErr := models.UserGet(intId)
-
-	if dbErr != nil {
-		middleware.NotFound(w, dbErr.Error())
+	user, err := models.UserGet(intId)
+	if err != nil {
+		utils.NotFound(w, err.Error())
 		return
 	}
 
-	middleware.Ok(w, user)
+	utils.Ok(w, user)
 }
 
 func userList(w http.ResponseWriter, r *http.Request) {
-	users, dbErr := models.UserList()
-
-	if dbErr != nil {
-		middleware.BadRequest(w, dbErr.Error())
+	users, err := models.UserList()
+	if err != nil {
+		utils.BadRequest(w, err.Error())
 		return
 	}
 
-	middleware.Ok(w, users)
+	utils.Ok(w, users)
 }
 
 func userPost(w http.ResponseWriter, r *http.Request) {
@@ -60,29 +57,26 @@ func userPost(w http.ResponseWriter, r *http.Request) {
 	var newUser models.User
 	json.Unmarshal(reqBody, &newUser)
 
-	validationErr := models.UserValidation(newUser)
-
-	if validationErr != nil {
-		middleware.BadRequest(w, validationErr.Error())
+	err := models.UserValidation(newUser)
+	if err != nil {
+		utils.BadRequest(w, err.Error())
 		return
 	}
 
-	newUser, dbErr := models.UserCreate(newUser)
-
-	if dbErr != nil {
-		middleware.BadRequest(w, dbErr.Error())
+	newUser, err = models.UserCreate(newUser)
+	if err != nil {
+		utils.BadRequest(w, err.Error())
 		return
 	}
 
-	middleware.Ok(w, newUser)
+	utils.Ok(w, newUser)
 }
 
 func userPut(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	intId, err := strconv.Atoi(id)
-
 	if err != nil {
-		middleware.NotFound(w, "Bad Id")
+		utils.NotFound(w, "Bad Id")
 		return
 	}
 
@@ -92,42 +86,38 @@ func userPut(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &updatedUser)
 
 	if intId != updatedUser.Id {
-		middleware.BadRequest(w, "Id in URL must match Id in body")
+		utils.BadRequest(w, "Id in URL must match Id in body")
 		return
 	}
 
-	validationErr := models.UserValidation(updatedUser)
-
-	if validationErr != nil {
-		middleware.BadRequest(w, validationErr.Error())
+	err = models.UserValidation(updatedUser)
+	if err != nil {
+		utils.BadRequest(w, err.Error())
 		return
 	}
 
-	updatedUser, dbErr := models.UserUpdate(updatedUser)
-
-	if dbErr != nil {
-		middleware.BadRequest(w, dbErr.Error())
+	updatedUser, err = models.UserUpdate(updatedUser)
+	if err != nil {
+		utils.BadRequest(w, err.Error())
 		return
 	}
 
-	middleware.Ok(w, updatedUser)
+	utils.Ok(w, updatedUser)
 }
 
 func userDelete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	intId, err := strconv.Atoi(id)
-
 	if err != nil {
-		middleware.BadRequest(w, "Bad Id")
+		utils.BadRequest(w, "Bad Id")
 		return
 	}
 
-	dbErr := models.UserDelete(intId)
-
-	if dbErr != nil {
-		middleware.NotFound(w, dbErr.Error())
+	err = models.UserDelete(intId)
+	if err != nil {
+		utils.NotFound(w, err.Error())
 		return
 	}
 
-	middleware.NoContent(w)
+	utils.NoContent(w)
 }
